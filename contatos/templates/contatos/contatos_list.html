@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de contatos{% endblock %}
+
+{% block content %}
+  {% if grupo %}
+    <h1>Contatos de <a href="{% url 'editar_grupo' grupo.id %}">{{ grupo.nome }}</a></h1>
+    <h5>Ver <a href="{% url 'grupos_list' %}">todos os grupos</a></h5>
+    <h5>Ver <a href="{% url 'contatos_list_view' %}">todos os contatos</a></h5>
+  {% else %}
+    <!-- NOVO -->
+    {% if busca %}
+      <h1>Busca: {{ busca }}</h1>
+      <h5>Ver <a href="{% url 'contatos_list_view' %}">todos os contatos</a></h5>
+    {% else %}
+      <h1>Contatos</h1>
+    {% endif %}
+  {% endif %}
+
+  <hr>
+  <div class="h-100 p-5 bg-light border rounded-3">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+      {% for contato in contatos %}
+        <div class="col">
+          <div class="card">
+            {% if contato.avatar %}
+              <img style="height:200px" src="{{ contato.avatar.url }}" class="card-img-top img-thumbnail" alt="...">
+            {% else %}
+              TESTE
+              <img style="height:200px" src="{% static 'fotos/iconfinder_user_account_profile_5402435.png' %}" class="card-img-top img-thumbnail" alt="...">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ contato.nome }}</h5>
+              <p>
+                {% for grupo in contato.grupos.all %}
+                  {{ grupo.nome }}
+                {% endfor %}
+              </p>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><h6 class="card-title">Telefones:</h6></li>
+              {% for tel in contato.telefone_set.all %}
+                <li class="list-group-item">Telefone {{ forloop.counter }}: {{ tel.numero }}</li>
+              {% endfor %}
+            </ul>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><h6 class="card-title">Emails:</h6></li>
+              {% for email in contato.email_set.all %}
+                <li class="list-group-item">Email {{ forloop.counter }}: {{ email.endereco }}</li>
+              {% endfor %}
+            </ul>
+            <li class="btn btn-primarylist-group-item text-end "><a class="btn btn-primary" href="{% url 'editar_contato' contato.id %}">Editar</a></li>
+          </div>
+        </div>
+      {% empty %}
+        {% if grupo %}
+          <h2>Não há nenhum contato associado com o grupo.</h2>
+        {% else %}
+          <h2>Não há contatos cadastrados</h2>
+        {% endif %}
+      {% endfor %}
+
+
+    </div>
+  </div>
+{% endblock %}

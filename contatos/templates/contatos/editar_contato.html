@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ contato.nome }}{% endblock %}
+{% block content %}
+  <div class="h-100 p-5 bg-light border rounded-3">
+    <h1>Editar {{contato.nome}}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <hr>
+      <h3>Editar Grupos</h3>
+      <!-- Primeiro, mostramos todos os campos do tipo 'checkbox', que serão
+      utilizados para apresentar os grupos existentes na aplicação. -->
+      {% for field in form.visible_fields %}
+        {% if field.field.widget.input_type == 'checkbox' %}
+          <div class="row">
+            <div class="col-11">
+              {{ field|as_crispy_field }}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+      <br>
+      <!-- Após mostrar todos os grupos da aplicação, vamos mostrar um botão que
+      futuramente será utilizado para levar o usuário para página de criação
+      de novos grupos. -->
+      <a class="btn btn-primary" href="{% url 'novo_grupo' %}">+ Grupo</a>
+      <hr>
+      <!-- Agora nós faremos um novo loop para mostrar os campos de email e de
+      telefone. -->
+      {% for field in form.visible_fields %}
+        {% with field.label_tag as tipo %}
+          {% if 'Email' in tipo %}
+            <div class="row">
+              <div class="col-11">
+                {{ field|as_crispy_field }}
+              </div>
+              <div class="col-1 pt-4">
+                <a class="btn btn-danger" href="{% url 'excluir_email' contato_id=contato.id label=field.label %}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          {% else %}
+              {% if 'Tel' in tipo %}
+                <div class="row">
+                  <div class="col-11">
+                    {{ field|as_crispy_field }}
+                  </div>
+                  <div class="col-1 pt-4">
+                    <a class="btn btn-danger" href="{% url 'excluir_telefone' contato_id=contato.id label=field.label %}">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              {% else %}
+                {% if field.field.widget.input_type != 'checkbox' %}
+                  <div class="row">
+                    <div class="col-11">
+                      {{ field|as_crispy_field }}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endif %}
+          {% endif %}
+        {% endwith %}
+      {% endfor %}
+      <br>
+      <!-- No final no formulário, mostramos uma sequência de botões. Por enquanto,
+      o único botão realmente funcional é o 'Salvar', que serve para enviar
+      os dados do formulário. -->
+      <p>
+        <input class="btn btn-success" type="submit" value="Salvar">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal{{ contato.id }}">
+          Excluir
+        </button>
+        <a class="btn btn-primary" href="{% url 'novo_tel' contato.id %}">+ Número</a>
+        <a class="btn btn-primary" href="{% url 'novo_email' contato.id %}">+ E-mail</a>
+      </p>
+      <!-- Modal -->
+      <div class="modal fade" id="modal{{ contato.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Excluir {{ contato.nome }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Tem certeza de que deseja excluir o contato {{ contato.nome }} junto de todos os seus telefones e e-mails?
+            </div>
+            <div class="modal-footer">
+              <a class='btn btn-danger' href="{% url 'excluir_contato' contato.id %}">Excluir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}
